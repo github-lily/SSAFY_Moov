@@ -56,7 +56,7 @@ const prompt = ref("");
 const messages = ref([]);
 const user_level = ref("")
 const level_list = ['Beginner','Elementary','Intermediate','Upper-Intermediate','Advanced']
-``
+
 const sendMessage = async () => {
   if (!prompt.value.trim) return;
 
@@ -72,11 +72,11 @@ const sendMessage = async () => {
     })
 
     const chatResponse = response.data.response;
-    for (level of level_list) {
-      if (level.exist(chatResponse)) {
-      user_level.value = level
-      } return level
-    }
+    // for (level of level_list) {
+    //   if (level.exist(chatResponse)) {
+    //   user_level.value = level
+    //   } return level
+    // }
 
     messages.value.push({ role : "assistant", content : chatResponse})
   } catch (error) {
