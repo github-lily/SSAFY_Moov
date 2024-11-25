@@ -1,30 +1,41 @@
-# TestView.vue
 <template>
   <div> 
-    <div class="test-title">Test Page</div>
-    <!-- 나중에 지울 코드 -->
-    <RouterLink :to="{name:'MovieView'}">Go Movies</RouterLink>
+    <div class="container">
 
-    <!-- chat gpt english level test -->
-    <div class="chat-box test-list">
-      <div v-for="(message, index) in messages" :key="index" class="message">
-        <div v-if="message.role === 'user'">
-          <p><strong>{{ username }}</strong> {{ message.content }}</p>
+      <div class="chat-box test-list">
+
+        <div v-for="(message, index) in messages" :key="index" class="message">
+
+          <div v-if="message.role === 'user'" class="user-message">
+            <p class="you fo">{{ username }}</p>
+            <p class="yourcomment comment fo">{{ message.content }}</p>
+          </div>
+
+          <div v-else>
+            <p class="moov ">MOOV</p>
+            <p class="Englishcomment comment fo">{{ message.content }}</p>
+          </div>
+
         </div>
-        <div v-else>
-          <p><strong>English Tutor:</strong> {{ message.content }}</p>
+
+      </div>
+      <!-- 입력 박스는 그대로 유지 -->
+      <div class="input-box">
+
+        <div class="input-container">
+          <input
+            v-model="prompt"
+            type="text"
+            @keyup.enter="sendMessage"
+            placeholder="입력해주세요."
+            />
+            <button @click="sendMessage" class="send-button">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
         </div>
+
       </div>
-    </div>
-    <div class="input-box">
-      <div>
-        <input
-        v-model="prompt"
-        type="text"
-        @keyup.enter="sendMessage"
-        />
-      </div>
-      <button @click="sendMessage">Send</button>
+
     </div>
   </div>
 </template>
@@ -93,58 +104,120 @@ const sendMessage = async () => {
 </script>
 
 <style scoped>
-h1 {
-  color: white;
-}
 
-.test-title {
-  margin: 20px 0;
-  font-family: 'Krona One';
-  font-size: 20px;
-  color: white;
-}
-
-.test-list {
+.container {
   width: 100%;
-  height: 100vh;
-  font-family: 'Noto Sans Korean';
+  max-width: 100%;
+  padding: 0 200px;
+  position: relative;
 }
 
-/* gpt가 만들어준 스타일 //*/
 .chat-box {
-  height: 300px;
-  overflow-y: scroll;
-  border: 1px solid #ccc;
+  margin-top: 5%;
+  margin-bottom: 100px;
+  height: calc(100vh - 150px); /* 채팅 영역 크기 */
+  /* overflow-y: auto; */
   padding: 10px;
-  margin-bottom: 10px;
-  color : white
+  color: white;
 }
 
+.fo {
+  font-family: 'Noto Sans KR';
+  /* font-weight: light; */
+}
 .message {
-  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
 }
 
+.message div {
+  max-width: 80%;
+  align-self: flex-start; /* 기본값은 왼쪽 정렬 */
+}
+
+.message div.user-message {
+  align-self: flex-end; /* 사용자 메시지는 오른쪽 정렬 */
+}
+
+.moov {
+  margin-bottom: 10px;
+  font-family: 'Krona One';
+
+}
+.you, .yourcomment {
+  text-align: right;
+}
+
+.English {
+  text-align: left;
+}
+
+.yourcomment {
+  background-color: rgb(255, 255, 115) ; 
+  color: rgb(68, 68, 68);
+  border-radius: 10px;
+  padding: 10px;
+  align-self: flex-end;
+}
+
+.Englishcomment {
+  background-color: #f1f0f0;
+  color: black;
+  border-radius: 10px;
+  padding: 10px;
+  align-self: flex-start;
+}
+
+/* 채팅 쪽 */
 .input-box {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px 20px;
   display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.input-container {
+  display: flex;
+  align-items: center;
   gap: 10px;
+  width: 100%;
+  margin-bottom: 50px;
+  max-width: 1000px;
 }
 
 input {
-  flex: 1;
-  padding: 5px;
+  flex-grow: 1;
+  width: calc(100% - 60px); /* 버튼 크기만큼 줄임 */
+  padding: 10px 20px;
+  border-radius: 20px;
   border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-button {
-  padding: 5px 10px;
+.send-button {
   background-color: #007bff;
-  color: white;
+  color: #fff;
   border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-button:hover {
+.send-button:hover {
   background-color: #0056b3;
 }
 
+.send-button i {
+  font-size: 18px;
+}
 </style>
