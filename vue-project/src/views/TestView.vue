@@ -1,18 +1,18 @@
+# TestView.vue
 <template>
   <div> 
-    <h1>Test Page</h1>
+    <div class="test-title">Test Page</div>
     <!-- 나중에 지울 코드 -->
     <RouterLink :to="{name:'MovieView'}">Go Movies</RouterLink>
 
     <!-- chat gpt english level test -->
-    <div class="chat-box">
-      <!-- 주고 받는 데이터를 실시간(stream)으로 출력 -->
+    <div class="chat-box test-list">
       <div v-for="(message, index) in messages" :key="index" class="message">
         <div v-if="message.role === 'user'">
           <p><strong>{{ username }}</strong> {{ message.content }}</p>
         </div>
         <div v-else>
-          <p><strong>Tester:</strong> {{ message.content }}</p>
+          <p><strong>English Tutor:</strong> {{ message.content }}</p>
         </div>
       </div>
     </div>
@@ -45,7 +45,7 @@ onMounted( async () => {
   if (authStore.token) {
     userStore.getUser()
     username.value = userStore.user.username
-    console.log(userStore.user.username, '님, 테스트 예정입니다.')
+    // console.log(userStore.user.username, '님, 테스트 예정입니다.')
   }
 })
 
@@ -54,7 +54,9 @@ onMounted( async () => {
 
 const prompt = ref("");
 const messages = ref([]);
-
+const user_level = ref("")
+const level_list = ['Beginner','Elementary','Intermediate','Upper-Intermediate','Advanced']
+``
 const sendMessage = async () => {
   if (!prompt.value.trim) return;
 
@@ -70,6 +72,11 @@ const sendMessage = async () => {
     })
 
     const chatResponse = response.data.response;
+    for (level of level_list) {
+      if (level.exist(chatResponse)) {
+      user_level.value = level
+      } return level
+    }
 
     messages.value.push({ role : "assistant", content : chatResponse})
   } catch (error) {
@@ -85,11 +92,23 @@ const sendMessage = async () => {
 
 </script>
 
-<style>
+<style scoped>
 h1 {
   color: white;
 }
 
+.test-title {
+  margin: 20px 0;
+  font-family: 'Krona One';
+  font-size: 20px;
+  color: white;
+}
+
+.test-list {
+  width: 100%;
+  height: 100vh;
+  font-family: 'Noto Sans Korean';
+}
 
 /* gpt가 만들어준 스타일 */
 .chat-box {
