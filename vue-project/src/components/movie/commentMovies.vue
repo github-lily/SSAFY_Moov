@@ -1,4 +1,4 @@
-<!-- 이 파일은 도대체 뭐임 -->
+<!-- 내가 댓글 단 영화 목록 -->
 <template>
   <div class="commented-movies">
     <div v-if="loading" class="text-center p-4">
