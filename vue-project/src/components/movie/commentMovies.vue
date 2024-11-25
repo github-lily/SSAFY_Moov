@@ -1,5 +1,4 @@
-<!-- 로그인한 사용자의 댓글 -->
-
+<!-- 이 파일은 도대체 뭐임 -->
 <template>
   <div class="commented-movies">
     <div v-if="loading" class="text-center p-4">
