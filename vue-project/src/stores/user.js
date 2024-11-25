@@ -29,6 +29,7 @@ export const useUserStore = defineStore('user', () => {
         });
         user.value = response.data; // Pinia 상태 업데이트
         return response.data; // 사용자 정보 반환
+        
     } catch (error) {
         console.error('Failed to fetch user data:', error);
         return null; // 실패 시 null 반환
