@@ -4,7 +4,7 @@
   <div class="comments-section">
     <div class="comments-create">
       <textarea v-model="newComment" placeholder="  댓글을 달아보세요!"></textarea>
-      <button class="register-button" @click="addComment">등록</button>
+      <button class="register-button" @click="addComment" style="color:black">등록</button>
     </div>
 
     <ul>
