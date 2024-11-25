@@ -29,20 +29,44 @@
 
 <script setup>
 import { RouterLink } from 'vue-router'
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useMovieStore } from '@/stores/movie';
+import { useUserStore } from '@/stores/user';
 
 const router = useRouter()
 const props = defineProps({
   movie:Object
 })
 
+const userStore = useUserStore()
 const movieStore = useMovieStore()
 // const toggleLikeMovie = movieStore.toggleLikeMovie
 
 const isLiked = ref(props.movie.user_like_movies)
 // const isLiked = computed(() => props.movie.user_like_movies);
+
+
+
+// const checkIfLiked = async () => {
+//     const user = userStore.getUser();
+//     if (user != null) {
+//         await movieStore.getLikes(user.id);
+//         isLiked.value = movieStore.likeList.some(like => like.movieId === props.movie.id);
+//         console.log('좋아요 여부 확인', isLiked.value)
+//     }
+// }
+
+// watch(() => props.movie, async (newmovie, oldmovie) => {
+//     if (newmovie && newmovie !== oldmovie) {
+//         await checkIfLiked();
+//     }
+// }, { deep: true, immediate: true });
+// onMounted(() => {
+//     checkIfLiked();
+// });
+
+
 
 const toggleLikeMovie = async (movieId) => {
   const result = await movieStore.toggleLikeMovie(movieId);

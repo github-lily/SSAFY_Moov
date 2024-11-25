@@ -214,5 +214,17 @@ export const useMovieStore = defineStore('movie', () => {
     }    
   }
 
-  return { movies, API_URL, getMovies, getMovieDetail, comments, getMovieComments, addComment, deleteComment, toggleLikeMovie}
+  const likeList = ref([])
+  const getLikes = function(userId) {
+    return axios.get(`${API_URL}/mypage/${userId}/likemovieslist`)
+    .then((res) => {
+      likeList.value = res.data;
+      console.log(res.data)
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+  }
+
+  return { movies, API_URL, getMovies, getMovieDetail, comments, getMovieComments, addComment, deleteComment, toggleLikeMovie, getLikes, likeList}
 },{ persist: true })
