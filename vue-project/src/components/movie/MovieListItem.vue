@@ -13,14 +13,12 @@
           <h3 class="movie-title">{{ movie.title }}</h3>
           <p class="overview">{{ truncateOverview(movie.overview) }}</p>
 
-          <span @click.stop="toggleLikeMovie(movie.id)">
-            <button 
+            <button @click.stop="toggleLikeMovie(movie.id)"
               class="likebtn" 
               :class="{ 'heart' : isLiked }" 
               >
               &#x2665;
             </button>
-          </span>
 
         </div>
       </div>
@@ -39,37 +37,34 @@ const router = useRouter()
 const props = defineProps({
   movie:Object
 })
-const { toggleLikeMovie } = useMovieStore()
 
-const isLiked = computed(() => props.movie.user_like_movies) //역참조해서 true false 알아냄
-console.log('props',props.movie.user_like_movies)
-console.log('좋아요 유무',isLiked) //togle하면 true, false 변경
-//
+const movieStore = useMovieStore()
+// const toggleLikeMovie = movieStore.toggleLikeMovie
 
-// const isLiked = computed(() => {
-//   console.log('isLiked value:', props.movie.user_like_movies)
-//   return Boolean(props.movie.user_like_movies) // Boolean으로 명시적 변환
-// })
+const isLiked = ref(props.movie.user_like_movies)
+// const isLiked = computed(() => props.movie.user_like_movies);
 
+const toggleLikeMovie = async (movieId) => {
+  const result = await movieStore.toggleLikeMovie(movieId);
+  isLiked.value = result.is_liked;
+};
 
-// const toggleLike = () => {
-//   isLiked.value = !isLiked.value
-// }
-
+watch(() => props.movie.user_like_movies, (newValue) => {
+  isLiked.value = newValue;
+}, { immediate: true });
 
 // 포스터 이미지 URL 설정
 const poster = `https://image.tmdb.org/t/p/w500/${props.movie.poster_path}`
 
-// 줄거리가 150자를 넘어갈 경우
 const truncateOverview = (text) => {
-  if (text.length > 150) {
-    return text.slice(0, 150) + '...'
+  if (!text || text.length === 0) {
+    return '정보가 없습니다.'; 
   }
-  return text
-
+  if (text.length > 150) {
+    return text.slice(0, 150) + '...';
+  }
+  return text;
 }
-
-
 
 // 영화 클릭 시 DetailView로 이동
 const goToDetail = (movie) => {
@@ -85,15 +80,20 @@ const goToDetail = (movie) => {
 <style>
 .movie-card {
   width: 100%;
-  transform-origin: center;
+  /* transform-origin: center; */
+  /* align-self: center; */
+  justify-content: center;
+  align-items: center;
   padding: 10px;
 }
 
 .poster-container {
   position: relative;
-  width: 90%;
+  width: 100%;
   border-radius: 20px;
+  align-self: center;
   overflow: hidden;
+  padding: 5px;
   transition: transform 0.3s ease;
 }
 
@@ -107,6 +107,8 @@ const goToDetail = (movie) => {
 
 .overlay {
   position: absolute;
+  padding: 5px;
+
   top: 0;
   left: 0;
   width: 100%;
@@ -185,5 +187,6 @@ const goToDetail = (movie) => {
 /* 선택적: 호버 효과 추가 */
 .likebtn:hover {
   transform: scale(1.1);
+  background-color: transparent;
 }
 </style>
