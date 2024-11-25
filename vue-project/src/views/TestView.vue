@@ -110,7 +110,7 @@ h1 {
   font-family: 'Noto Sans Korean';
 }
 
-/* gpt가 만들어준 스타일 */
+/* gpt가 만들어준 스타일 //*/
 .chat-box {
   height: 300px;
   overflow-y: scroll;

@@ -189,6 +189,7 @@ export const useMovieStore = defineStore('movie', () => {
 
   // 좋아요
   const toggleLikeMovie = async function (movieId) {
+
     const config = {
       url: `${API_URL}/api/v1/movies/${movieId}/likemovies/`,
       method: 'post',
@@ -196,7 +197,7 @@ export const useMovieStore = defineStore('movie', () => {
     }
     try {
       let res = await axios(config)      
-      console.log(res.data)
+      console.log('좋아요 유무:', res.data.is_liked)
       movies.value = movies.value.map(movie => {
         if (movie.id === movieId) {
           return {
@@ -212,7 +213,6 @@ export const useMovieStore = defineStore('movie', () => {
       return err
     }    
   }
-
 
   return { movies, API_URL, getMovies, getMovieDetail, comments, getMovieComments, addComment, deleteComment, toggleLikeMovie}
 },{ persist: true })
