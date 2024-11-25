@@ -44,7 +44,7 @@ const { toggleLikeMovie } = useMovieStore()
 const isLiked = computed(() => props.movie.user_like_movies) //역참조해서 true false 알아냄
 console.log('props',props.movie.user_like_movies)
 console.log('좋아요 유무',isLiked) //togle하면 true, false 변경
-
+//
 
 // const isLiked = computed(() => {
 //   console.log('isLiked value:', props.movie.user_like_movies)
