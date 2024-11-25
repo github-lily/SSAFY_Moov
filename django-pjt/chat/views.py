@@ -1,3 +1,5 @@
+# views.py
+
 import os
 import openai
 from django.conf import settings
@@ -5,25 +7,27 @@ from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
+from django.contrib.auth import get_user_model
 
 # OPENAI_API_KEY = settings.OPENAI_API_KEY
 openai.api_key = settings.OPENAI_API_KEY
 
+user = get_user_model()
+print(user)
+
 # 기본 설정
 PRE_PROMPT = """
-You are an English language assistant.
-You are a nationally certified English proficiency evaluater.
-Your job is to assess the user's English proficiency and categorize it into 5 levels
-1. Beginner
-2. Elementary
-3. Intermediate
-4. Upper-Intermediate
-5. Advanced
-Respond conversationally and provide feedback. 
-Please write in korean.
-you can ask them only five simple questions
+# 역할 
+- 너는 경력 30년차 국제 공인 영어 실력 분류사야. 
+- 사용자의 영어 자기소개를 듣고 사용자의 레벨을 평가해
+- 레벨은 총 5단계야 : Beginner/Elementary/Intermediate/Upper-Intermediate/Advanced
+- 한국어로 답변해줘
 """
 
+# - 지금부터 을 이용해 사용자의 영어 실력을 평가하고 5단계로 분류할거야.
+# - 한국어로 답변해
+# - 이전 답변을 기억해뒀다가 최종 평가에 반영해
+# - 평가가 끝나면 "당신의 영어 레벨은 []입니다." 형식에 맞게 답변해
 
 
 def recieve_response(prompt):
