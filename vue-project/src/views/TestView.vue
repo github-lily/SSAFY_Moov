@@ -7,111 +7,81 @@
     <!-- chat gpt english level test -->
     <div class="chat-box">
       <!-- 주고 받는 데이터를 실시간(stream)으로 출력 -->
-      <div v-for="(message, index) in chatMessages" :key="index" class="message">
-          <p><strong>{{ newUser.username }}</strong> {{ message.user }}</p>
-          <p><strong>Tester:</strong> {{ message.ai }}</p>
+      <div v-for="(message, index) in messages" :key="index" class="message">
+        <div v-if="message.role === 'user'">
+          <p><strong>{{ username }}</strong> {{ message.content }}</p>
+        </div>
+        <div v-else>
+          <p><strong>Tester:</strong> {{ message.content }}</p>
+        </div>
       </div>
     </div>
-    <!-- error message 출력 -->
-    <!-- <div v-if="errorMessage" class="error">
-      <p>{{ errorMessage }}</p>
-    </div> -->
     <div class="input-box">
-      <p>'테스트 시작'을 입력하면 테스트가 시작합니다.</p>
-      <input
-        v-model="userMessage"
+      <div>
+        <input
+        v-model="prompt"
         type="text"
-        placeholder="테스트 시작"
         @keyup.enter="sendMessage"
-      />
+        />
+      </div>
       <button @click="sendMessage">Send</button>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import { RouterLink } from 'vue-router';
-import MovieView from './MovieView.vue';
 import axios from "axios"
-import { errorMessages } from 'vue/compiler-sfc';
+import { onMounted, ref } from 'vue';
 import { useUserStore } from '@/stores/user';
+import { useAuthStore } from '@/stores/auth';
+
+const userStore = useUserStore()
+const authStore = useAuthStore()
+const username = ref('')
+
+// user정보 가져오기
+onMounted( async () => {
+  if (authStore.token) {
+    userStore.getUser()
+    username.value = userStore.user.username
+    console.log(userStore.user.username, '님, 테스트 예정입니다.')
+  }
+})
 
 
-export default {
-  data() {
-    return {
-      userMessage: "",
-      chatMessages: [],
-      errorMessages:"", //에러 메시지를 저장
-      stream: null, // EventSource 객체
-      newUser: null,    // 사용자 정보를 저장
-    };
-  },
-  methods: {
-    
-    // user 정보 가져오기
-    async getUserInfo() {
-        const userStore = useUserStore();
-        const newUser = await userStore.getUser(); // 데이터를 비동기로 가져옴
-        if (newUser) {
-            this.newUser = newUser; // 가져온 데이터를 컴포넌트 상태에 저장
-        } else {
-            console.error("Failed to fetch user info.");
-        }
-    },
 
-    sendMessage() {
-      if (!this.userMessage.trim()) return;
 
-      // Add user message to chat
-      this.chatMessages.push({ user: this.userMessage, ai: "" });
+const prompt = ref("");
+const messages = ref([]);
 
-      // Stream AI response
-      const eventSource = new EventSource(
-        `http://127.0.0.1:8000/api/chat/stream-chat/?message=${encodeURIComponent(this.userMessage)}`
-      );
-      this.stream = eventSource;
+const sendMessage = async () => {
+  if (!prompt.value.trim) return;
 
-      // 연결이 성공적으로 됐을 때 호출
-      eventSource.onopen = () => {
-        console.log("Connection opened");
-        this.errorMessage = ""; // 연결 성공 시 에러 메시지 초기화
-      };
+  messages.value.push({ role: "user", content: prompt.value });
 
-      // 서버에서 데이터가 도착했을 때 호출
-      eventSource.onmessage = (event) => {
-        const lastMessage = this.chatMessages[this.chatMessages.length - 1];
-        lastMessage.ai += event.data; // Append AI's response chunk
-      };
+  try {
+    const response = await axios.post("http://127.0.0.1:8000/chat/", {
+      prompt : prompt.value, // 사용자 입력
+    }, {
+      headers : {
+        "Content-Type" : "application/json", // Json 데이터로 전송
+      }
+    })
 
-      // 연결 중 문제가 발생했을 때 호출
-      eventSource.onerror = (error) => {
-        console.error("EventSource error:", error);
+    const chatResponse = response.data.response;
 
-        // 에러 메시지 표시
-        this.errorMessage = "Connection error. Please try again later.";
-
-        // EventSource 닫기
-        eventSource.close();
-      };
-
-      // input 창 초기화
-      this.userMessage = ""; 
-    },
-  },
-
-  // 컴포넌트가 로드될 때 사용자 정보를 가져오기
-  mounted() {
-    this.getUserInfo();
-  },
-
-  // 컴포넌트가 파괴될 때 EventSource 연결 닫기
-  beforeDestroy() {
-    if (this.stream) {
-      this.stream.close();
-    }
-  },
-};
+    messages.value.push({ role : "assistant", content : chatResponse})
+  } catch (error) {
+    console.error("Error sending message:", error)
+    messages.value.push({
+      role : "assistant",
+      content: "요청 처리에 문제가 발생했습니다. 다시 시도해주세요."
+    })
+  }
+  
+  prompt.value = ""
+}
 
 </script>
 
@@ -119,15 +89,16 @@ export default {
 h1 {
   color: white;
 }
-</style>
 
-<!-- gpt가 만들어준 스타일 -->
+
+/* gpt가 만들어준 스타일 */
 .chat-box {
   height: 300px;
   overflow-y: scroll;
   border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 10px;
+  color : white
 }
 
 .message {
@@ -156,3 +127,5 @@ button {
 button:hover {
   background-color: #0056b3;
 }
+
+</style>
