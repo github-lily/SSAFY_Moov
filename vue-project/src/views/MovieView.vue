@@ -165,6 +165,7 @@ body {
   align-items: center;
   font-family: 'Krona One';
   border: none;
+  color: black;
 }
 
 .introtext {

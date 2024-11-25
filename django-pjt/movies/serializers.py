@@ -88,4 +88,4 @@ class MovieListSerializer(serializers.ModelSerializer):
 
     class Meta :
         model = Movie
-        fields = ('id','title','movie_like_users')
+        fields = '__all__'

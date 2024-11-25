@@ -1,66 +1,65 @@
 <template>
   <div>
     <HeaderNav />
-    <h2 style="color: white;">{{ username }}님이 좋아요한 영화 </h2>
-    <ul>
-      <!-- 영화 목록 -->
-      <!-- <li v-for="movie in likedMovies" :key="movie.id">
-        {{ movie.title }}
-      </li> -->
-    </ul>
+    <div class="container">
+      <div class="my-favorites components">
+            <p class="favorite"> My Favorites</p>
+            <div v-if="likemovies.length > 0">
+              <MovieList :movies="likemovies" />
+            </div>
+            <div v-else>
+              <p class="no-likes">영화를 찜해보세요!</p>
+            </div>
+
+          </div>
+      </div>
   </div>
 </template>
 
 <script setup>
-import HeaderNav from '@/components/common/HeaderNav.vue'
-import { useRoute } from 'vue-router'
-import { ref, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import { useUserStore } from '@/stores/user'
-import { storeToRefs } from 'pinia'
+import HeaderNav from '@/components/common/HeaderNav.vue';
+import { storeToRefs } from 'pinia';
+import { useAuthStore } from '@/stores/auth';
+import MovieList from '@/components/movie/MovieList.vue';
+import { useUserStore } from '@/stores/user';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 
-const route = useRoute()
+
 const authStore = useAuthStore()
+const {username} = storeToRefs(authStore)
+
 const userStore = useUserStore()
-const { username } = storeToRefs(authStore)
-const { user } = storeToRefs(userStore)
-const likedMovies = ref([])
+const likemovies = ref([])
+
+const API_URL = 'http://127.0.0.1:8000';
 
 
+onMounted(async () => {
+  if (username.value) {
+    try {
+      // 유저 정보 가져오기
+      const user = await userStore.getUser();
 
-// onMounted(async () => {
-//   console.log('해당 유저 정보:', user.value)
-//   try {
-//     // 사용자 정보 가져오기
-//     await userStore.getUser()
-    
-//     // 사용자의 좋아요 영화 목록 가져오기
-//     axios({
-//       method: 'get',
-//       url: `http://127.0.0.1:8000/movies/likemovies/${username.value}/`,
-//       headers: {
-//         Authorization: `Token ${authStore.token}`
-//       }
-//     })
-//     .then((res) => {
-//       likedMovies.value = res.data
-//       console.log('좋아요한 영화 목록:', likedMovies.value)
-//     })
-//     .catch((err) => {
-//       console.error('좋아요 영화 목록 가져오기 실패:', err)
-//     })
-//   } catch (error) {
-//     console.error('Error:', error)
-//   }
-// })
+      if (user.pk) {
+        const likeResponse = await axios({
+          method: 'get',
+          url: `${API_URL}/api/v1/mypage/${user.pk}/likemovieslist/`,
+          headers: {
+            Authorization: `Token ${authStore.token}`,
+          },
+        });
+        likemovies.value = likeResponse.data;
+      } 
+    } catch (error) {
+      console.error('데이터 가져오기 실패:', error);
+    }
+  } 
+});
+
 
 </script>
 
 <style scoped>
-/* h1 {
-  font-family: 'Krona One';
-  text-align: center;
-  color: white;
-  font-size: 20px;
-} */
+
 </style>
