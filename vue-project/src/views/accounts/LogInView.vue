@@ -8,7 +8,7 @@
       <input class="secondinput" type="password" id="password" v-model.trim="password" placeholder="비밀번호를 입력하세요.">
       <!-- <input type="submit" value="Log In" > -->
       <div>
-        <button class="btn btn-primary" type="submit">Log In</button>
+        <button class="btn btn-primary" type="submit" >Log In</button>
       </div>
       <!-- <p v-if="errorMessage" class="error">{{ errorMessage }}</p> -->
       <a href="#" @click="goToSignUp">회원가입</a>
@@ -20,7 +20,6 @@
 import { useAuthStore } from '@/stores/auth';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-// import { errorMessages } from 'vue/compiler-sfc';
 
 const store = useAuthStore()
 const username = ref(null)

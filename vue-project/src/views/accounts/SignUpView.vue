@@ -46,9 +46,7 @@ const goToLogIn = () => {
   router.push({name:'LogInView'})
 }
 
-// const goToTestPreView = () => {
-//   router.push({name:'TestPreView'})
-// }
+
 </script>
 
 <style scoped>

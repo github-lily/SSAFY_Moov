@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import router from '@/router'
+import { useUserStore } from './user'
 
 export const useAuthStore = defineStore('auth', () => {
   
@@ -11,7 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
   const token = ref(null)               // 토큰을 받아서 저장할 변수
   const router = useRouter()
   const username = ref('')
-  
+  const userStore = useUserStore()
   
   // 로그인 여부 확인
   const isLogin = computed(()=> {
@@ -24,54 +25,56 @@ export const useAuthStore = defineStore('auth', () => {
   
   
   // 회원가입 요청 액션
-  const signUp = function(payload) {
+  const signUp = async function(payload) {
     const {username: signUpUsername, password1, password2} = payload
     
-    axios ({
-      method:'post',
-      url:`${API_URL}/accounts/signup/`,
-      data: {
-        username: signUpUsername, password1, password2
-      }
+    try {
+      const res = await axios ({
+        method:'post',
+        url:`${API_URL}/accounts/signup/`,
+        data: {
+          username: signUpUsername, password1, password2
+        }
     })
-    .then((res) => {
-      console.log(res)
-      console.log(signUpUsername, '님 회원가입 성공')
-      username.value = signUpUsername
-      router.replace({name:'TestPreView'})
-    })
-    .catch((err) => {
-      console.log(err)
-      const message = err.response.data.username[0]
-      alert (`${message}`)
-      // alert ('입력 정보가 잘못되었습니다')
-    })
+    token.value = res.data.key
+    username.value = signUpUsername
+    await userStore.getUser()
+    router.replace({name:'TestPreView'})
+    console.log(signUpUsername, '님 회원가입 성공')
+  } catch (err) {
+    console.log(err)
+    }
   }
+
   
   
   // 로그인 성공하면 token 변수에 토큰을 저장
-  const logIn = function(payload) {
+  const logIn = async function(payload) {
     const {username: loginUsername, password} = payload
     
-    axios ({
-      method:'post',
-      url:`${API_URL}/accounts/login/`,
-      data: {
+
+    try {
+      const res = await axios({
+        method: 'post', 
+        url:`${API_URL}/accounts/login/`,
+        data: {
         username: loginUsername, password,
-      }
-    })
-    .then((res) => {
+        }
+      })
       token.value = res.data.key
       username.value = loginUsername
-      router.push({name : 'MovieView'})
-      console.log(loginUsername,'님 로그인 성공')
-    })
-    .catch((err) => {
+
+      //사용자 정보 가져옴
+      await userStore.getUser()
+
+      router.push({name: 'MovieView'})
+      console.log(loginUsername, '님 로그인 성공')
+    } catch (err) {
       console.log(err)
-      alert(' 사용자 정보가 없습니다!')
-    })
+      alert('사용자 정보가 없습니다.')
+    }
   }
-  
+
   // 로그아웃
   const logOut = function() {
     axios({
@@ -92,7 +95,6 @@ export const useAuthStore = defineStore('auth', () => {
   function setUsername(newUsername) {
     username.value = newUsername
   }
-
-  return { API_URL, signUp, logIn, logOut, token, isLogin, setUsername, username}
-}, { persist: true })
-
+  
+  return  { API_URL, signUp, logIn, logOut, token, isLogin, setUsername, username}
+},{ persist: true })

@@ -9,18 +9,18 @@
       <!-- 마우스를 올릴 경우 -->
       <div class="overlay">
 
-        <!-- <a class="movie-info" @click="goToDetail(movie)" :href="`/movies/${movie.id}`"> -->
         <div class="movie-info" @click="goToDetail(movie)">
           <h3 class="movie-title">{{ movie.title }}</h3>
           <p class="overview">{{ truncateOverview(movie.overview) }}</p>
 
-          
-          <button 
-            class="likebtn" 
-            :class="{  isLiked: isLiked  }" 
-            @click.stop="toggleLikeMovie">
-            &#x2665;
-          </button>
+          <span @click.stop="toggleLikeMovie(movie.id)">
+            <button 
+              class="likebtn" 
+              :class="{ 'heart' : isLiked }" 
+              >
+              &#x2665;
+            </button>
+          </span>
 
         </div>
       </div>
@@ -35,15 +35,27 @@ import { ref, watch, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useMovieStore } from '@/stores/movie';
 
-
-
 const router = useRouter()
 const props = defineProps({
   movie:Object
 })
-
 const { toggleLikeMovie } = useMovieStore()
-const isLiked = computed(() => props.movie.is_liked)
+
+const isLiked = computed(() => props.movie.user_like_movies) //역참조해서 true false 알아냄
+console.log('props',props.movie.user_like_movies)
+console.log('좋아요 유무',isLiked) //togle하면 true, false 변경
+
+
+// const isLiked = computed(() => {
+//   console.log('isLiked value:', props.movie.user_like_movies)
+//   return Boolean(props.movie.user_like_movies) // Boolean으로 명시적 변환
+// })
+
+
+// const toggleLike = () => {
+//   isLiked.value = !isLiked.value
+// }
+
 
 // 포스터 이미지 URL 설정
 const poster = `https://image.tmdb.org/t/p/w500/${props.movie.poster_path}`
@@ -57,9 +69,6 @@ const truncateOverview = (text) => {
 
 }
 
-const toggleLike = () => {
-  isLiked.value = !isLiked.value
-}
 
 
 // 영화 클릭 시 DetailView로 이동
@@ -166,9 +175,15 @@ const goToDetail = (movie) => {
   color: white;
   transition: color 0.3s ease;
   align-self: center;
+  padding: 8px;
 }
 
-.likebtn.liked {
-  color: red;
+.heart {
+  color: #ff0000 !important; 
+}
+
+/* 선택적: 호버 효과 추가 */
+.likebtn:hover {
+  transform: scale(1.1);
 }
 </style>
