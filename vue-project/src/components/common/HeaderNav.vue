@@ -60,8 +60,8 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 const {username} = storeToRefs(authStore)
-console.log(username.value, '좋아요로 넘길 값') //username 잘 나옴
-// console.log(username.value, '좋아요로 넘길 값') //username 잘 나옴
+console.log('사용자:',username.value) //username 잘 나옴
+
 
 
 const GoToHome = () => {
@@ -97,24 +97,8 @@ const handleSearch = async () => {
   // 만약 사용자가 검색을 했다면
   if (searchKeyword.value) {
     
-
-    // 새로고침 오류 해결 
     if (searchKeyword.value) {
 
-
-    // // 먼저 영화 데이터를 가져옵니다
-    // await movieStore.getMovies()
-    
-    // // 검색 결과 페이지로 이동
-    // await router.push({
-    //   name: 'SearchResults',
-    //   params: { keyword: searchKeyword.value }
-    // })
-
-    // // 검색 후 입력창 초기화
-    // searchKeyword.value = ''
-
-    // 새로고침해야하는 코드
     router.push({
       name: 'SearchResults',
       params: { keyword: searchKeyword.value }

@@ -93,26 +93,26 @@ export const useMovieStore = defineStore('movie', () => {
             //       console.log(err)
             //     })
             // }
-            const comments = ref([])
             
             // const getMovieComments = async function (movieId) {
               //   try {
                 //     console.log('영화번호댓글:',movieId) //38잘 나옴
                 //     const response = await axios({
                   //       method: 'get',
-  //       url: `${API_URL}/api/v1/movies/${movieId}/comments/`,
-  //       headers: {
-    //         Authorization: `Token ${authStore.token}`
-    //       }
-    //     })
-    //     comments.value = response.data
-    //     console.log('해당 영화 댓글 조회:', comments.value)
-    
-    //   } catch (err) {
-      //     console.error('Error fetching comments:', err)
-  //   }
-  // }
-
+                  //       url: `${API_URL}/api/v1/movies/${movieId}/comments/`,
+                  //       headers: {
+                    //         Authorization: `Token ${authStore.token}`
+                    //       }
+                    //     })
+                    //     comments.value = response.data
+                    //     console.log('해당 영화 댓글 조회:', comments.value)
+                    
+                    //   } catch (err) {
+                      //     console.error('Error fetching comments:', err)
+                      //   }
+                      // }
+                      
+  const comments = ref([])
   const lastFetchedMovieId = ref(null)  // 마지막으로 불러온 영화 ID 추적
   const isLoading = ref(false) // 로딩 상태 
 

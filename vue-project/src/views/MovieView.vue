@@ -50,9 +50,8 @@ const router = useRouter()
 const store = useMovieStore()
 const authStore = useAuthStore()
 const userStore = useUserStore()
-const {username} = storeToRefs(authStore)
 
-console.log(username.value, '님의 메인페이지')
+
 const movies = ref([])
 const selectedGenre = ref("")
 
@@ -97,6 +96,8 @@ onMounted(async () => {
   if (authStore.token) {
     userStore.getUser()
     console.log('현재 로그인한 유저 정보:', userStore.user)
+  console.log(userStore.user.username, '님의 메인페이지')
+    
     console.log('유저의 토큰:', authStore.token)
   } else {
     console.log('로그인이 필요합니다.')

@@ -10,21 +10,35 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
-import { storeToRefs } from 'pinia';
+import { useAuthStore } from '@/stores/auth'; // 회원가입쪽
+import { useUserStore } from '@/stores/user'; // d유저 정보쪽
+import { onMounted } from 'vue';
+import { ref } from 'vue';
 
-const store = useAuthStore()
 
-// storeToRefs로 반응형 상태 추출
-const {username} = storeToRefs(store)
+const userStore = useUserStore()
+const authStore = useAuthStore()
 const router = useRouter()
+const username = ref('')
 
+// import { storeToRefs } from 'pinia';
+// storeToRefs로 반응형 상태 추출
+// const {username} = storeToRefs(store)
 // console.log(username.value)
 
 const goToTestView = () => {
   router.push({name: 'TestView'})
 }
 
+
+// 로그인 한 사용자 정보 가져오기
+onMounted( async () => {
+  if (authStore.token) {
+    userStore.getUser()
+    username.value = userStore.user.username
+    console.log(userStore.user.username, '님, 테스트 예정입니다.')
+  }
+})
 
 </script>
 
