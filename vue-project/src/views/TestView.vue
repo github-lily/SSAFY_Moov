@@ -1,8 +1,11 @@
 <template>
   <div> 
-    <div class="container">
 
-      <div class="chat-box test-list">
+      <div class="chat-box test-list" >
+        <div class="home" @click="goToHome" >
+        <!-- <i class="fa-solid fa-house"></i> -->
+         <h1 class="home">MOOV</h1>
+        </div>
 
         <div v-for="(message, index) in messages" :key="index" class="message">
 
@@ -37,7 +40,7 @@
       </div>
 
     </div>
-  </div>
+  
 </template>
 
 <script setup>
@@ -46,21 +49,26 @@ import axios from "axios"
 import { onMounted, ref } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
+
 
 const userStore = useUserStore()
 const authStore = useAuthStore()
 const username = ref('')
+const router = useRouter()
 
 // user정보 가져오기
 onMounted( async () => {
   if (authStore.token) {
     userStore.getUser()
     username.value = userStore.user.username
-    // console.log(userStore.user.username, '님, 테스트 예정입니다.')
+    console.log(userStore.user.username, '님, 테스트 시작합니다.')
   }
 })
 
-
+const goToHome = () => {
+  router.push({name:'MovieView'})
+} 
 
 
 const prompt = ref("");
@@ -104,20 +112,29 @@ const sendMessage = async () => {
 </script>
 
 <style scoped>
-
-.container {
+.home:hover {
+  cursor: pointer;
+  font-size: 150%;;
+  }
+.home {
+  text-align: center;
+  font-family: 'Krona One';
+  margin: 20px 0;
+} 
+.chat-container {
   width: 100%;
   max-width: 100%;
-  padding: 0 200px;
+  padding: 20%;
+  max-height: 80%;
   position: relative;
 }
 
 .chat-box {
-  margin-top: 5%;
+  margin-top: 50px;
   margin-bottom: 100px;
   height: calc(100vh - 150px); /* 채팅 영역 크기 */
   /* overflow-y: auto; */
-  padding: 10px;
+  padding: 10px 20%;
   color: white;
 }
 
@@ -154,7 +171,7 @@ const sendMessage = async () => {
 }
 
 .yourcomment {
-  background-color: rgb(255, 255, 115) ; 
+  background-color: #ffeb3b ; 
   color: rgb(68, 68, 68);
   border-radius: 10px;
   padding: 10px;
@@ -175,7 +192,6 @@ const sendMessage = async () => {
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 10px 20px;
   display: flex;
   justify-content: center;
   align-items: center;

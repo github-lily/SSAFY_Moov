@@ -73,7 +73,7 @@ h1 {
 }
 
 .btn:hover {
-  background-color: rgb(238, 238, 19);
+  background-color: #ffeb3b;
 }
 
 .tr {

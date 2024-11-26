@@ -16,12 +16,23 @@
 
     <div class="recom">
       <h3>Today's recommendation</h3>
+      <!-- 레벨 선택 버튼 -->
+      <div class="level-buttons">
+        <button
+          v-for="level in levelOptions"
+          :key="level"
+          :class="['level-button', { active: selectedLevel === level }]"
+          @click="selectLevel(level)"
+        >
+          {{ level }}
+        </button>
+      </div>
         <!-- 장르 선택 -->
-          <select id="genre-select" v-model="selectedGenre" class="custom-select">
-            <option value="" selected disabled hidden class="placeholder-option">All Genre</option>
-            <option class="lists" v-for="genre in genres" 
-            :key="genre.id" :value="genre.name">{{ genre.name }}</option>
-          </select>
+        <select id="genre-select" v-model="selectedGenre" class="custom-select">
+          <option value="" selected disabled hidden class="placeholder-option">All Genre</option>
+          <option class="lists" v-for="genre in availableGenres" 
+          :key="genre" :value="genre">{{ genre }}</option>
+        </select>
     </div>
       
       <!-- 필터된 영화들만 출력 -->
@@ -31,37 +42,70 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed, watch } from 'vue'
-import MovieList from '@/components/movie/MovieList.vue';
-import { useMovieStore } from '@/stores/movie'
-import HeaderNav from '@/components/common/HeaderNav.vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useMovieStore } from '@/stores/movie';
 import { useAuthStore } from '@/stores/auth';
-import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores/user';
+import HeaderNav from '@/components/common/HeaderNav.vue';
+import MovieList from '@/components/movie/MovieList.vue';
 
+const router = useRouter();
+const store = useMovieStore();
+const authStore = useAuthStore();
+const userStore = useUserStore();
+
+const movies = ref([]);
+const selectedGenre = ref("");
+const selectedLevel = ref(""); // 현재 선택된 레벨
 
 const goToTest = () => {
   router.push({name:'TestView'})
 }
 
+// 레벨별 장르 매핑
+const levelGenreMapping = {
+  1: ['애니메이션', '가족'],
+  2: ['TV 영화', '로맨스', '코미디'],
+  3: ['드라마', '판타지', '어드벤처'],
+  4: ['범죄', '역사', '음악', '미스터리', '액션', '스릴러', '공포'],
+  5: ['SF', '다큐멘터리', '음악', '서부', '전쟁']
+};
 
-const router = useRouter()
-const store = useMovieStore()
-const authStore = useAuthStore()
-const userStore = useUserStore()
+// 레벨 옵션
+const levelOptions = [1, 2, 3, 4, 5];
 
+// 사용 가능한 장르 (선택된 레벨에 따라 변경)
+const availableGenres = ref(['All Genre']);
 
-const movies = ref([])
-const selectedGenre = ref("")
+// 특정 레벨 선택 시 호출되는 함수
+const selectLevel = (level) => {
+  selectedLevel.value = level;
+  availableGenres.value = ['All Genre', ...levelGenreMapping[level]];
+  selectedGenre.value = ""; // 장르 초기화
+};
 
+// 영화 필터링 로직
 const filteredMovies = computed(() => {
-  if(!selectedGenre.value) {
-    return movies.value
+  let result = movies.value;
+
+  // 레벨 필터링
+  if (selectedLevel.value) {
+    const levelGenres = levelGenreMapping[selectedLevel.value];
+    result = result.filter(movie =>
+      movie.genres.some(genre => levelGenres.includes(genre.name))
+    );
   }
-  return movies.value.filter(movie => 
-  movie.genres.some(genre => genre.name === selectedGenre.value))  //장르리스트 중 하나라도 맞으면 넣겠다.
-})
+
+  // 장르 필터링
+  if (selectedGenre.value) {
+    result = result.filter(movie =>
+      movie.genres.some(genre => genre.name === selectedGenre.value)
+    );
+  }
+
+  return result;
+});
 
 // 영화 장르 (id와 name이 매칭된 형태로 저장)
 const genres = ref([
@@ -84,26 +128,16 @@ const genres = ref([
   { id: 53, name: "스릴러" },
   { id: 10752, name: "전쟁" },
   { id: 37, name: "서부" }
-])
+]);
 
-console.log('movie:', store.movies)
-
-// 사용자 정보, 영화 정보 가져오기
-onMounted(async () => {
+onMounted(() => {
   store.getMovies();
   movies.value = store.movies;
-  
-  if (authStore.token) {
-    userStore.getUser()
-    console.log('현재 로그인한 유저 정보:', userStore.user)
-  console.log(userStore.user.username, '님의 메인페이지')
-    
-    console.log('유저의 토큰:', authStore.token)
-  } else {
-    console.log('로그인이 필요합니다.')
-  }
-})
 
+  if (authStore.token) {
+    userStore.getUser();
+  }
+});
 </script>
 
 <style scoped>
@@ -157,7 +191,7 @@ body {
 .test {
   width: 240px;
   height: 240px;
-  background-color: rgb(255, 255, 115) !important; 
+  background-color: #ffeb3b  !important; 
   border-radius: 50%;
   align-self: flex-end;
   display: flex;
@@ -190,18 +224,20 @@ body {
 
 .recom  {
   display: flex;
-  padding: 20px 0;}
+  padding: 20px 0;
+  /* justify-content: center; */
+  align-items: center;
+
+}
 
 .custom-select {
   background-color: transparent;
-  /* border-radius: 5px;
-   */
   color: white;
   padding: 8px;
   font-family: 'NoTo Sans KR';
   border: none;
   border-bottom: 0.1px solid rgb(161, 161, 161);
-  /* text-align: center; */
+  margin-right: 20px;
 }
 
 .custom-select:focus {
@@ -223,4 +259,31 @@ h3 {
   /* text-align: center; */
   /* padding: auto; */
 }
+
+.level-buttons {
+  display: flex;
+  gap: 10px;
+  margin-right: 20px;
+}
+
+.level-button {
+  padding: 10px 20px; 
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: 'Krona One';
+}
+
+.level-button.active {
+  background-color: #ffeb3b;
+  color: black;
+}
+
+.level-button:hover {
+  background-color: #ffeb3b;
+  color: black;
+}
+
 </style>
