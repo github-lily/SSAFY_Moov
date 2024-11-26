@@ -3,7 +3,8 @@
 import os
 import openai
 from django.conf import settings
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
@@ -25,7 +26,7 @@ PRE_PROMPT = """
 - 너는 경력 30년차 국제 공인 영어 실력 분류사다.
 - 지금부터 간단한 질의응답을 통해 사용자의 영어 실력을 평가하고 5단계로 분류한다.
 - 레벨은 총 5단계 : Beginner/Elementary/Intermediate/Upper-Intermediate/Advanced
-- 질문은 5개만 할 수 있다
+- 질문은 3개만 할 수 있다. 간단하게 답할 수 있는걸 질문한다.
 - 평가가 끝나면 "당신의 영어 레벨은 []입니다." 형식에 맞게 답변한다.
 """
 
@@ -47,21 +48,27 @@ def get_completion(messages):
 
 
 
-@csrf_exempt
+# @csrf_exempt
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def stream_chat(request) :
-    print(request.user) 
+    # print(request.user.id) 
+    # print(request.data)
     if request.method == 'POST' :
-        try :
-            data = JSONParser().parse(request)
-            print(f"Received data: {data}")  # 요청 데이터 디버깅
-        except Exception as e:
-            print(f"JSON Parse Error: {e}")
-            return JsonResponse({'response': 'Invalid JSON format.'}, status=400)
+        # try :
+        #     data = JSONParser().parse(request)
+        #     print(f"Received data: {data}")  # 요청 데이터 디버깅
+        # except Exception as e:
+        #     print(f"JSON Parse Error: {e}")
+        #     return JsonResponse({'response': 'Invalid JSON format.'}, status=400)
 
-        user_id = data.get('user_id', 'default')
-        prompt = data.get('prompt', None)
-        clear = data.get('clear', False)
+
+        # user_id = data.get('user_id', 'default')
+        # prompt = data.get('prompt', None)
+        # clear = data.get('clear', False)
+        user_id = request.user.id
+        prompt = request.data.get('prompt', None)
+        clear = request.data.get('clear', False)
         
         # 대화 초기화(히스토리까지)
         if clear:
@@ -82,19 +89,21 @@ def stream_chat(request) :
 
         try:
             response_message = get_completion(CHAT_HISTORY[user_id])
+            # print(CHAT_HISTORY)
             CHAT_HISTORY[user_id].append({"role": "assistant", "content": response_message})
-            print(response_message)
+            # print(response_message)
 
 
             # 레벨 정보가 포함되어 있는지 검사
             level_list = ['Beginner','Elementary','Intermediate','Upper-Intermediate','Advanced']
+            print(response_message)
             for level in level_list:
                 if level in response_message:
-                    user = User.objects.get(pk=request.user.id)
-                    print(request.user)
-                    user.level = level
-                    user.save()
-                    print(f"User {user_id}'s level updated to: {level}")
+                    print('level',level)
+                    request.user.level = level
+                    print('views',request.user.level)
+                    request.user.save()
+                    # print(f"User {user_id}'s level updated to: {level}")
             
 
         except Exception as e:
