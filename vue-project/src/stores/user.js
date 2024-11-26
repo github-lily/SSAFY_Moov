@@ -20,7 +20,6 @@ export const useUserStore = defineStore('user', () => {
             console.error('User is not authenticated: No token found')
             return null;
           }
-    // 11.25 수정 . 비동기로 전환
         try {
             const response = await axios.get(`${API_URL}/user/`, {
                 headers: {
@@ -36,18 +35,7 @@ export const useUserStore = defineStore('user', () => {
         return null; // 실패 시 null 반환
     }
 }
-    //     axios({
-    //         method: 'get',
-    //         url: `${API_URL}/accounts/user`,
-    //         headers: {
-    //         Authorization: `Token ${authStore.token}`
-    //         }
-        
-    //     })
-    //     .then((res) => {
-    //         user.value = res.data
-    //     })
-    //     .catch((err) => console.log('Failed to fetch user data:', err))
+
 
     // 좋아요 기능 구현
     const likeMovies = function() {

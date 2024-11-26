@@ -82,6 +82,7 @@ onMounted(async () => {
           },
         });
         commentmovies.value = commentResponse.data;
+
         console.log('사용자가 댓글 단 영화 목록:', commentmovies.value);
 
         // 좋아요한 영화 목록 가져오기

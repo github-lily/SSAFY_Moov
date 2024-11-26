@@ -67,6 +67,7 @@ onMounted(async () => {
   }
 });
 
+
 const goToHome = () => {
   router.push({name:'MovieView'})
 } 
@@ -85,11 +86,24 @@ const sendMessage = async () => {
   messages.value.push({ role: "user", content: prompt.value });
 
   try {
-    const response = await axios.post("http://127.0.0.1:8000/chat/", {
-      user_id : user_id.value,
-      prompt : prompt.value, // 사용자 입력
-      
-    });
+    const config={
+      url: "http://127.0.0.1:8000/chat/",
+      method: 'post',
+      headers: {
+            Authorization: `Token ${authStore.token}`,
+      },
+      data: {
+        user_id : user_id.value,
+        prompt : prompt.value, // 사용자 입력      
+      }
+    }
+    const response = await axios(config)
+    // const response = await axios.post("http://127.0.0.1:8000/chat/", data={
+    //   user_id : user_id.value,
+    //   prompt : prompt.value, // 사용자 입력      
+    // }, headers={
+    //         Authorization: `Token ${authStore.token}`,
+    //       });
 
     // 챗봇 응답
     const chatbotResponse = response.data.response;
@@ -122,11 +136,18 @@ const sendMessage = async () => {
 // 메시지 초기화
 const clearMessages = async () => {
   try {
-    const response = await axios.post("http://127.0.0.1:8000/chat/", {
-      headers: {Authorization: `Token ${authStore.token}`},
-      user_id : user_id.value, // 사용자 고유 ID
-      clear: true,       // 초기화 플래그
-    });
+    const config={
+      url: "http://127.0.0.1:8000/chat/",
+      method: 'post',
+      headers: {
+            Authorization: `Token ${authStore.token}`,
+      },
+      data: {
+        user_id : user_id.value,
+        clear:true,
+      }
+    }
+    const response = await axios(config)
     messages.value = []; // 로컬 메시지 초기화
     console.log(response.data.response); // "대화가 초기화되었습니다."
   } catch (error) {
@@ -137,9 +158,17 @@ const clearMessages = async () => {
 // 사용자 레벨 업데이트 함수
 const updateUserLevel = async (level) => {
   try {
-    await axios.patch(`http://127.0.0.1:8000/user/`, {
-      level: level,
-    });
+    const config={
+      url: "http://127.0.0.1:8000/chat/",
+      method: 'post',
+      headers: {
+            Authorization: `Token ${authStore.token}`,
+      },
+      data: {
+        level:level
+      }
+    }
+    const ans = await axios(config)
     console.log("사용자 레벨이 업데이트되었습니다:", level);
   } catch (error) {
     console.error("사용자 레벨 업데이트 중 오류가 발생했습니다:", error);
