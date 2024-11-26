@@ -41,10 +41,10 @@ onMounted(async () => {
       // 유저 정보 가져오기
       const user = await userStore.getUser();
 
-      if (user.pk) {
+      if (user.id) {
         const likeResponse = await axios({
           method: 'get',
-          url: `${API_URL}/api/v1/mypage/${user.pk}/likemovieslist/`,
+          url: `${API_URL}/api/v1/mypage/${user.id}/likemovieslist/`,
           headers: {
             Authorization: `Token ${authStore.token}`,
           },
@@ -61,5 +61,21 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.my-favorites {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
 
+.favorite{
+  font-family: 'Krona One';
+  font-size: 2em;
+}
+
+.no-likes{
+  font-family: 'Noto Sans KR';
+  font-weight: lighter;
+}
 </style>
