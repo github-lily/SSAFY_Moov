@@ -110,7 +110,7 @@ input::placeholder {
 }
 
 .btn:hover {
-  background-color: rgb(238, 238, 19);
+  background-color: #ffeb3b;
 }
 a {
   color: white;

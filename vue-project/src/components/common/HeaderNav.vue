@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class=" sticky-top">
     <div class="container">
       <nav class="navbar navbar-expand-lg bg-body-tertiary" >
 
@@ -126,7 +126,9 @@ const handleSearch = async () => {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
+
 
 .navbar {
   width: 100%;
@@ -135,14 +137,10 @@ const handleSearch = async () => {
   border-radius: 50px; 
   padding-left: 50px;
   padding-right: 50px;
-  background-color: red;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
 }
 
 .bg-body-tertiary {
-  background-color: rgb(255, 255, 115) !important; 
+  background-color: #ffeb3b !important; 
 }
 
 .navbar-brand {
