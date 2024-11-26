@@ -14,18 +14,23 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
               <li class="nav-item">
                 <a class="nav-link" aria-current="page" href="#" @click="GoToHome" >홈</a>
               </li>
+
               <li class="nav-item">
                 <a class="nav-link" href="#" @click="GoToLikeMovies(username)">내가 찜한 리스트</a>
               </li>
+
               <li class="nav-item">
                 <a class="nav-link" href="#"  @click="GoToMyPage">마이페이지</a>
               </li>
+
               <li class="nav-item">
                 <a class="nav-link" href="#" @click="handleLogout">로그아웃</a>
               </li>
+
             </ul>
             <!-- 검색창 -->
             <form class="d-flex" role="search" @submit.prevent="handleSearch">
@@ -151,6 +156,7 @@ const handleSearch = async () => {
 
 .nav-link {
   font-family: 'Noto Sans KR';
+  margin-bottom: 0;
 }
 
 .movieSearch {
@@ -167,5 +173,6 @@ const handleSearch = async () => {
   border-bottom: 1px solid gray;
   outline: none;
 }
+
 
 </style>

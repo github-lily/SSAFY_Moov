@@ -8,7 +8,7 @@
         <div class="img-box">
           <img src="@/assets/profile.png" alt="프로필 이미지">
         </div>
-        <p class="level">{{ username }}님의 level</p>
+        <p class="level">{{ userlevel }}</p>
       </div>
       
       <div class="userinfo">
@@ -62,7 +62,7 @@ const commentmovies = ref([])
 const likemovies = ref([])
 
 const API_URL = 'http://127.0.0.1:8000';
-
+const userlevel = ref('')
 
 onMounted(async () => {
   if (username.value) {
@@ -70,7 +70,8 @@ onMounted(async () => {
       // 유저 정보 가져오기
       const user = await userStore.getUser();
       console.log('현재 유저 정보:', user); //잘 나옴
-
+      console.log('현재 유저 레벨', user.level )
+      userlevel.value = user.level
       if (user.id) {
         
         // 댓글 단 영화 목록 가져오기
@@ -174,5 +175,9 @@ img {
 .no-comment, .no-likes {
   font-family: 'Noto Sans KR';
   color: rgb(202, 202, 202);
+}
+
+.level {
+  font-weight: bold;
 }
 </style>

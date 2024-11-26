@@ -9,13 +9,45 @@
         </p>
       </div>
       <div class="intro-right">
-        <div class="mainmovie"></div>
-        <button class="test" @click="goToTest">TEST &#9654</button>
+        <div id="carouselExample" class="carousel slide mainmovie">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="@/assets/harrypotter.jpg" class="d-block w-100 carousel-image" alt="Harry Potter">
+          </div>
+          <div class="carousel-item">
+            <img src="@/assets/rudderless.jpg" class="d-block w-100 carousel-image" alt="Rudderless">
+          </div>
+          <div class="carousel-item">
+            <img src="@/assets/inter.jpg" class="d-block w-100 carousel-image" alt="Interstellar">
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+        </div>
+        
+        <div class="box">
+          <div class="innerbox">
+            <div class="circle" @click="goToTest">
+              <span ></span>
+              <span></span>
+              <span></span>
+              <button class="btn">TEST &#9654</button>
+            </div>
+          </div>
+        </div>
+
+
       </div>
     </div>
 
+    <h3>Today's recommendation</h3>
     <div class="recom">
-      <h3>Today's recommendation</h3>
       <!-- 레벨 선택 버튼 -->
       <div class="level-buttons">
         <button
@@ -65,15 +97,15 @@ const goToTest = () => {
 
 // 레벨별 장르 매핑
 const levelGenreMapping = {
-  1: ['애니메이션', '가족'],
-  2: ['TV 영화', '로맨스', '코미디'],
-  3: ['드라마', '판타지', '어드벤처'],
-  4: ['범죄', '역사', '음악', '미스터리', '액션', '스릴러', '공포'],
-  5: ['SF', '다큐멘터리', '음악', '서부', '전쟁']
+  'Beginner': ['애니메이션', '가족'],
+  'Elementary': ['TV 영화', '로맨스', '코미디'],
+  'Intermediate': ['드라마', '판타지', '어드벤처'],
+  'Upper-intermediate': ['범죄', '역사', '음악', '미스터리', '액션', '스릴러', '공포'],
+  'advanced': ['SF', '다큐멘터리', '음악', '서부', '전쟁']
 };
 
 // 레벨 옵션
-const levelOptions = [1, 2, 3, 4, 5];
+const levelOptions = ['Beginner', 'Elementary', 'Intermediate', 'Upper-intermediate', 'advanced'];
 
 // 사용 가능한 장르 (선택된 레벨에 따라 변경)
 const availableGenres = ref(['All Genre']);
@@ -195,12 +227,28 @@ body {
 .mainmovie {
   width: 100%;
   height: 50%;
-  background-color: white;
+  /* background-color: white; */
   border-radius: 20px;
   margin-bottom: 20px;
+  overflow: hidden; /* 경계 너머의 이미지를 잘라냄 */
+  position: relative; /* 위치 설정 */
+}
+.carousel-inner {
+  width: 100%;
+  height: 100%; /* 부모 요소 높이에 맞춤 */
 }
 
-.test {
+.carousel-image {
+  width: inherit; /* 이미지를 컨테이너 너비에 맞춤 */
+  height: inherit; /* 이미지를 컨테이너 높이에 맞춤 */
+  /* object-fit: cover; 비율을 유지하며 컨테이너에 맞춤 */
+  border-radius: 20px; /* 부모의 border-radius 상속 */
+}
+
+
+
+/* circle 시작 */
+/* .test {
   width: 240px;
   height: 240px;
   background-color: #ffeb3b  !important; 
@@ -212,7 +260,89 @@ body {
   font-family: 'Krona One';
   border: none;
   color: black;
+} */
+
+
+.box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 240px;
 }
+
+.innerbox {
+  display: flex;
+}
+
+.circle {
+  width: 240px;
+  /* margin: 40px; */
+  height: 240px;
+  position: relative;
+}
+
+.btn {
+  width: 240px;
+  height: 240px;
+  background-color: #ffeb3b  !important; 
+  border-radius: 50%;
+  align-self: flex-end;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Krona One';
+  border: none;
+  color: black;
+
+}
+
+.circle span {
+  position: absolute;
+  border: 1px solid white;
+  width: inherit;
+  height: inherit;
+  border-radius: 40% 60% 65% 35% / 40% 45% 55% 60%;
+  transition: 0.5s;
+}
+
+.circle span:nth-child(1) {
+  animation: circle 6s linear infinite;
+  /* opacity: 0.3; */
+}
+
+.circle span:nth-child(2) {
+  animation: circle 4s linear infinite;
+  animation-direction: reverse;
+}
+
+.circle span:nth-child(3) {
+  animation: circle 10s linear infinite;
+  opacity: 0.8;
+}
+
+.circle:hover span:nth-child(1) {
+  opacity: 0.3;
+}
+.circle:hover span:nth-child(2) {
+  opacity: 0.5;
+}
+.circle:hover span:nth-child(3) {
+  opacity: 0.5;
+}
+
+@keyframes circle {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+/* circle 끝 */
+
 
 .introtext {
   padding-left: 3%;
@@ -244,6 +374,7 @@ body {
 
 .custom-select {
   background-color: transparent;
+  margin-left: 50px;
   color: white;
   padding: 8px;
   font-family: 'NoTo Sans KR';
