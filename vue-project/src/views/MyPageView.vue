@@ -71,7 +71,7 @@ onMounted(async () => {
       const user = await userStore.getUser();
       console.log('현재 유저 정보:', user); //잘 나옴
 
-      if (user.pk) {
+      if (user.id) {
         
         // 댓글 단 영화 목록 가져오기
         const commentResponse = await axios({
@@ -83,10 +83,11 @@ onMounted(async () => {
         });
         commentmovies.value = commentResponse.data;
         console.log('사용자가 댓글 단 영화 목록:', commentmovies.value);
+
         // 좋아요한 영화 목록 가져오기
         const likeResponse = await axios({
           method: 'get',
-          url: `${API_URL}/api/v1/mypage/${user.pk}/likemovieslist/`,
+          url: `${API_URL}/api/v1/mypage/${user.id}/likemovieslist/`,
           headers: {
             Authorization: `Token ${authStore.token}`,
           },
@@ -156,7 +157,7 @@ img {
 }
 
 .useinfo {
-  border: 1px solid yellow;
+  border: 1px solid #ffeb3b;
 
 }
 .components {

@@ -22,12 +22,13 @@ export const useUserStore = defineStore('user', () => {
           }
     // 11.25 수정 . 비동기로 전환
         try {
-            const response = await axios.get(`${API_URL}/user`, {
+            const response = await axios.get(`${API_URL}/user/`, {
                 headers: {
                     Authorization: `Token ${authStore.token}`,
                 },
         });
         user.value = response.data; // Pinia 상태 업데이트
+        // console.log(user.value)
         return response.data; // 사용자 정보 반환
         
     } catch (error) {
@@ -62,5 +63,5 @@ export const useUserStore = defineStore('user', () => {
         })
     }
 
-	return { user, isLike, isMovieLike, getUser }
+	return { user, isLike, isMovieLike, getUser, likeMovies }
 }, { persist: true })

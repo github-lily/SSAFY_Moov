@@ -1,49 +1,40 @@
 <template>
-  <div> 
+   
 
+      <!-- 홈으로 -->
+
+      <div class="home sticky-top" @click="goToHome" >
+        <h1 class=" moovtext ">MOOV</h1>
+      </div>
       <div class="chat-box test-list">
-        <button @click="clearMessages" class="clear-button">
-              <p>초기화</p>
-            </button>
-      <div class="chat-box test-list" >
-        <div class="home" @click="goToHome" >
-        <!-- <i class="fa-solid fa-house"></i> -->
-         <h1 class="home">MOOV</h1>
-        </div>
-
-        <div v-for="(message, index) in messages" :key="index" class="message">
-
-          <div v-if="message.role === 'user'" class="user-message">
-            <p class="you fo">{{ username }}</p>
-            <p class="yourcomment comment fo">{{ message.content }}</p>
+        <!-- 메세지 창 -->
+          <div v-for="(message, index) in messages" :key="index" class="message">
+            <div v-if="message.role === 'user'" class="user-message">
+              <p class="you fo">{{ username }}</p>
+              <p class="yourcomment comment fo">{{ message.content }}</p>
+            </div>
+            <div v-else>
+              <p class="moov ">MOOV</p>
+              <p class="Englishcomment comment fo">{{ message.content }}</p>
+            </div>
           </div>
-
-          <div v-else>
-            <p class="moov ">MOOV</p>
-            <p class="Englishcomment comment fo">{{ message.content }}</p>
+          <!-- 입력 하는 곳-->
+          <div class="input-box">
+            
+            <div class="input-container">
+              <input
+              v-model="prompt"
+              type="text"
+              @keyup.enter="sendMessage"
+              placeholder="입력해주세요."
+              />
+              <button @click="sendMessage" class="send-button"><i class="fa-solid fa-paper-plane"></i></button>
+              <button @click="clearMessages" class="clear-button"><i class="fa-solid fa-reply"></i></button>
+            </div>
+            
           </div>
-
         </div>
-
-      </div>
-      <!-- 입력 박스는 그대로 유지 -->
-      <div class="input-box">
-
-        <div class="input-container">
-          <input
-            v-model="prompt"
-            type="text"
-            @keyup.enter="sendMessage"
-            placeholder="입력해주세요."
-            />
-            <button @click="sendMessage" class="send-button">
-              <i class="fa-solid fa-paper-plane"></i>
-            </button>
-        </div>
-
-      </div>
-
-    </div>
+   
   
 </template>
 
@@ -63,14 +54,18 @@ const user_id = ref('')
 const router = useRouter()
 
 // user정보 가져오기
-onMounted( async () => {
+onMounted(async () => {
   if (authStore.token) {
-    const User = userStore.getUser()
-    username.value = User.username
-    user_id.value = User.pk
-    console.log(User.pk, '님, 테스트 시작합니다.')
+    try {
+      const User = await userStore.getUser(); // 비동기 호출 대기
+      username.value = User.username;
+      user_id.value = User.pk;
+      console.log(User.username, '님, 테스트 시작합니다.'); // username 출력
+    } catch (error) {
+      console.error('사용자 정보를 가져오는 데 실패했습니다:', error);
+    }
   }
-})
+});
 
 const goToHome = () => {
   router.push({name:'MovieView'})
@@ -154,14 +149,15 @@ const updateUserLevel = async (level) => {
 </script>
 
 <style scoped>
-.home:hover {
+.moovtext:hover {
   cursor: pointer;
   font-size: 150%;;
-  }
-.home {
+}
+.moovtext {
+  color: white;
   text-align: center;
   font-family: 'Krona One';
-  margin: 20px 0;
+  margin: 100px 0;
 } 
 .chat-container {
   width: 100%;
@@ -230,9 +226,6 @@ const updateUserLevel = async (level) => {
 
 /* 채팅 쪽 */
 .input-box {
-  position: fixed;
-  bottom: 0;
-  left: 0;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -243,8 +236,6 @@ const updateUserLevel = async (level) => {
   align-items: center;
   gap: 10px;
   width: 100%;
-  margin-bottom: 50px;
-  max-width: 1000px;
 }
 
 input {
@@ -276,16 +267,23 @@ input {
 }
 
 .clear-button {
-  background-color: white;
-  color: black;
-  border-radius: 100px;
-  text-align: center;
-  padding: 10px;
-  margin-bottom: 5px;
-  font-family: 'Noto Sans KR';
+  background-color: #ffeb3b;
+  color: #4b4b4b;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.send-button i {
-  font-size: 18px;
+.clear-button:hover {
+  background-color: #c0ad00;
+  color: #ffffff;
 }
+
 </style>
