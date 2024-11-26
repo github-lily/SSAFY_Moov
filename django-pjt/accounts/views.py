@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 
 from rest_framework.response import Response
-from .serializers import UserSerializer, UserImgSerializer
+from .serializers import UserImgSerializer, CustomRegisterSerializer, CustomUserDetailSerializer
 from movies.serializers import MovieSerializer
 from rest_framework.authentication import TokenAuthentication, BasicAuthentication
 
@@ -16,7 +16,7 @@ from movies.models import Movie
 
 # from .models import Comment, Profile
 
-
+User = get_user_model()
 
 # 이미지 업로드
 @api_view(['GET', 'PUT'])
@@ -44,13 +44,22 @@ def upload_img(request, user_id):
 def user_profile(request, user_id):
     user = get_object_or_404(get_user_model(), id=user_id)
     if request.method == 'GET':
-        user_serializer = UserSerializer(user)
+        user_serializer = CustomUserDetailSerializer(user)
         # data = {
         #     'user' : user_serializer.data,
         # }
         return Response(user_serializer.data)
     
+
+# 유저 정보 가져오기
+@api_view(['GET'])
+def get_user(request) :
+    serializer = CustomUserDetailSerializer(request.user)
+    return Response(serializer.data)
     
+
+
+
 
 
 # @api_view(['POST'])

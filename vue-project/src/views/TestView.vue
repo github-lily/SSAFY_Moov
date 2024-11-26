@@ -3,7 +3,9 @@
     <div class="container">
 
       <div class="chat-box test-list">
-
+        <button @click="clearMessages" class="clear-button">
+              <p>초기화</p>
+            </button>
         <div v-for="(message, index) in messages" :key="index" class="message">
 
           <div v-if="message.role === 'user'" class="user-message">
@@ -50,13 +52,15 @@ import { useAuthStore } from '@/stores/auth';
 const userStore = useUserStore()
 const authStore = useAuthStore()
 const username = ref('')
+const user_id = ref('')
 
 // user정보 가져오기
 onMounted( async () => {
   if (authStore.token) {
-    userStore.getUser()
-    username.value = userStore.user.username
-    // console.log(userStore.user.username, '님, 테스트 예정입니다.')
+    const User = userStore.getUser()
+    username.value = User.username
+    user_id.value = User.pk
+    console.log(User.pk, '님, 테스트 예정입니다.')
   }
 })
 
@@ -68,6 +72,8 @@ const messages = ref([]);
 const user_level = ref("")
 const level_list = ['Beginner','Elementary','Intermediate','Upper-Intermediate','Advanced']
 
+
+// 메시지 주고받기
 const sendMessage = async () => {
   if (!prompt.value.trim) return;
 
@@ -75,31 +81,65 @@ const sendMessage = async () => {
 
   try {
     const response = await axios.post("http://127.0.0.1:8000/chat/", {
+      user_id : user_id.value,
       prompt : prompt.value, // 사용자 입력
-    }, {
-      headers : {
-        "Content-Type" : "application/json", // Json 데이터로 전송
+      
+    });
+
+    // 챗봇 응답
+    const chatbotResponse = response.data.response;
+
+    // 챗봇 응답 추가
+    messages.value.push({ role: "assistant", content: chatbotResponse });
+
+    // 응답에서 레벨 확인 및 저장
+    
+    level_list.forEach((level) => {
+      if (chatbotResponse.includes(level)) {
+        user_level.value = level;
+        updateUserLevel(level); // 사용자 레벨 정보 업데이트 함수 호출
       }
-    })
+    });
 
-    const chatResponse = response.data.response;
-    // for (level of level_list) {
-    //   if (level.exist(chatResponse)) {
-    //   user_level.value = level
-    //   } return level
-    // }
 
-    messages.value.push({ role : "assistant", content : chatResponse})
   } catch (error) {
-    console.error("Error sending message:", error)
+    console.error("Error sending message:", error);
     messages.value.push({
-      role : "assistant",
-      content: "요청 처리에 문제가 발생했습니다. 다시 시도해주세요."
-    })
+      role: "assistant",
+      content: "죄송합니다. 요청 처리 중 문제가 발생했습니다. 잠시후 다시 시도해주세요.",
+    });
   }
-  
-  prompt.value = ""
-}
+
+  prompt.value = ""; // 입력 필드 초기화
+};
+
+
+// 메시지 초기화
+const clearMessages = async () => {
+  try {
+    const response = await axios.post("http://127.0.0.1:8000/chat/", {
+      headers: {Authorization: `Token ${authStore.token}`},
+      user_id : user_id.value, // 사용자 고유 ID
+      clear: true,       // 초기화 플래그
+    });
+    messages.value = []; // 로컬 메시지 초기화
+    console.log(response.data.response); // "대화가 초기화되었습니다."
+  } catch (error) {
+    console.error("Error clearing messages:", error);
+  }
+};
+
+// 사용자 레벨 업데이트 함수
+const updateUserLevel = async (level) => {
+  try {
+    await axios.patch(`http://127.0.0.1:8000/user/`, {
+      level: level,
+    });
+    console.log("사용자 레벨이 업데이트되었습니다:", level);
+  } catch (error) {
+    console.error("사용자 레벨 업데이트 중 오류가 발생했습니다:", error);
+  }
+};
 
 </script>
 
@@ -215,6 +255,16 @@ input {
 
 .send-button:hover {
   background-color: #0056b3;
+}
+
+.clear-button {
+  background-color: white;
+  color: black;
+  border-radius: 100px;
+  text-align: center;
+  padding: 10px;
+  margin-bottom: 5px;
+  font-family: 'Noto Sans KR';
 }
 
 .send-button i {

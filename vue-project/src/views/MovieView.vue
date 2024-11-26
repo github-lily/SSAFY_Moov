@@ -94,8 +94,8 @@ onMounted(async () => {
   movies.value = store.movies;
   
   if (authStore.token) {
-    userStore.getUser()
-    console.log('현재 로그인한 유저 정보:', userStore.user)
+    const user = userStore.getUser()
+    console.log('현재 로그인한 유저 정보:', user)
   console.log(userStore.user.username, '님의 메인페이지')
     
     console.log('유저의 토큰:', authStore.token)

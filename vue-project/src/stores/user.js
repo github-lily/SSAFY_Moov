@@ -22,7 +22,7 @@ export const useUserStore = defineStore('user', () => {
           }
     // 11.25 수정 . 비동기로 전환
         try {
-            const response = await axios.get(`${API_URL}/accounts/user`, {
+            const response = await axios.get(`${API_URL}/user`, {
                 headers: {
                     Authorization: `Token ${authStore.token}`,
                 },

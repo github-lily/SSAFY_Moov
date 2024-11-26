@@ -182,3 +182,7 @@ TMDB_API_KEY = '1593e61ad102246a93537bf80f459601'
 from decouple import config
 
 OPENAI_API_KEY = config("VITE_OPEN_AI_API_KEY", default=None)
+
+REST_AUTH = {
+    'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
+}

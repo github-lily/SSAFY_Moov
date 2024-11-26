@@ -21,7 +21,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # 메인페이지로 가는 url
     path('api/v1/', include('movies.urls')),
-    # mypage용 accounts url
+    # accounts url
     path('user/', include('accounts.urls')),
     # 권한 관련 url
     path('accounts/', include('dj_rest_auth.urls')),

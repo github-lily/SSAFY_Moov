@@ -8,65 +8,98 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
+from django.shortcuts import render, get_object_or_404
 
 # OPENAI_API_KEY = settings.OPENAI_API_KEY
 openai.api_key = settings.OPENAI_API_KEY
 
-user = get_user_model()
-print(user)
+User = get_user_model()
+
+# 대화 히스토리 유지를 위한 딕셔너리
+CHAT_HISTORY = {}
 
 # 기본 설정
 PRE_PROMPT = """
 # 역할 
-- 너는 경력 30년차 국제 공인 영어 실력 분류사야. 
-- 사용자의 영어 자기소개를 듣고 사용자의 레벨을 평가해
-- 레벨은 총 5단계야 : Beginner/Elementary/Intermediate/Upper-Intermediate/Advanced
-- 한국어로 답변해줘
+- 한국어로 이야기한다.
+- 너는 경력 30년차 국제 공인 영어 실력 분류사다.
+- 지금부터 간단한 질의응답을 통해 사용자의 영어 실력을 평가하고 5단계로 분류한다.
+- 레벨은 총 5단계 : Beginner/Elementary/Intermediate/Upper-Intermediate/Advanced
+- 질문은 5개만 할 수 있다
+- 평가가 끝나면 "당신의 영어 레벨은 []입니다." 형식에 맞게 답변한다.
 """
 
-# - 지금부터 을 이용해 사용자의 영어 실력을 평가하고 5단계로 분류할거야.
-# - 한국어로 답변해
-# - 이전 답변을 기억해뒀다가 최종 평가에 반영해
-# - 평가가 끝나면 "당신의 영어 레벨은 []입니다." 형식에 맞게 답변해
 
 
-def recieve_response(prompt):
-    full_prompt = f"{PRE_PROMPT}\n # 사용자 입력: {prompt}\n # 응답:"
-    print(full_prompt)  # 디버깅 용도
-    # stream = openai.chat.completions.create(
-    completion = openai.chat.completions.create(
-        model="gpt-4o-mini",  # 원하는 모델 지정
-        # stream=True,
-        messages=[
-            {
-                "role": "user", 
-                "content": full_prompt
-            }
-        ],
-    )
-    # 응답 메시지 추출
-    # for chunk in stream:
-    #     response_message = chunk.choices[0].delta.content or "", end=""
-    #     print(chunk.choices[0].delta.content or "", end="")
+# OPEN AI API 호출
+def get_completion(messages):
+    try :
+        completion = openai.chat.completions.create(
+            model="gpt-4o-mini",  # 원하는 모델 지정
+            messages=messages,
+        )
+        response_message = completion.choices[0].message.content
+        return response_message
+    # 일반 예외 처리
+    except Exception as e  :
+        print(f"Open API Error : {e}")
+        raise e     # 필요시 예외를 다시 던짐
 
-    response_message = completion.choices[0].message.content
-    print(response_message)
-    return response_message
-
-    
 
 
 @csrf_exempt
 @api_view(['POST'])
 def stream_chat(request) :
+    print(request.user) 
     if request.method == 'POST' :
-        data = JSONParser().parse(request)
-        prompt = data.get('prompt', None)  # 사용자 입력
+        try :
+            data = JSONParser().parse(request)
+            print(f"Received data: {data}")  # 요청 데이터 디버깅
+        except Exception as e:
+            print(f"JSON Parse Error: {e}")
+            return JsonResponse({'response': 'Invalid JSON format.'}, status=400)
+
+        user_id = data.get('user_id', 'default')
+        prompt = data.get('prompt', None)
+        clear = data.get('clear', False)
         
+        # 대화 초기화(히스토리까지)
+        if clear:
+            CHAT_HISTORY.pop(user_id, None)
+            return JsonResponse({'response': '대화가 초기화되었습니다.'})
+    
+
         # 요청이 빈 값일 경우
         if not prompt :
             return JsonResponse({'response' : '유효한 입력이 필요합니다.'}, status=400)
         
-        # 올바른 요청일 경우 응답 생성
-        response = recieve_response(prompt)
-        return JsonResponse({'response' : response})
+
+
+        if user_id not in CHAT_HISTORY:
+            CHAT_HISTORY[user_id] = [{"role": "system", "content": PRE_PROMPT}]
+
+        CHAT_HISTORY[user_id].append({"role": "user", "content": prompt})
+
+        try:
+            response_message = get_completion(CHAT_HISTORY[user_id])
+            CHAT_HISTORY[user_id].append({"role": "assistant", "content": response_message})
+            print(response_message)
+
+
+            # 레벨 정보가 포함되어 있는지 검사
+            level_list = ['Beginner','Elementary','Intermediate','Upper-Intermediate','Advanced']
+            for level in level_list:
+                if level in response_message:
+                    user = User.objects.get(pk=request.user.id)
+                    print(request.user)
+                    user.level = level
+                    user.save()
+                    print(f"User {user_id}'s level updated to: {level}")
+            
+
+        except Exception as e:
+            # print(f"OpenAI API Error: {e}")
+            print(e)
+            return JsonResponse({'response': 'OpenAI API 요청 중 문제가 발생했습니다.'}, status=500)
+
+        return JsonResponse({'response': response_message})

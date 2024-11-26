@@ -5,24 +5,29 @@ from django.contrib.auth import get_user_model
 from movies.models import Movie
 # from .models import Comment
 from movies.serializers import MovieSerializer
-
+from dj_rest_auth.registration.serializers import RegisterSerializer
 
 User = get_user_model()
 
 
-class UserSerializer(serializers.ModelSerializer):
+class CustomRegisterSerializer(RegisterSerializer):
+    profile_img = serializers.CharField(required = False, allow_blank=True, max_length=255)
+    level = serializers.CharField(required = False, allow_blank=True, max_length=255)
 
-    # class MovieSerializer(serializers.ModelSerializer):
-    #     class Meta:
-    #         model = Movie
-    #         fields = '__all__'
-
-    # # 찜한 영화 
+    # 찜한 영화 
     # like_movies = MovieSerializer(source='user_like_movies', many=True, read_only=True)
 
     class Meta:
         model = User
         fields = '__all__'
+
+
+class CustomUserDetailSerializer(serializers.ModelSerializer) :
+    class Meta :
+        model = User
+        fields = '__all__'
+
+
 
 # 프로필 이미지
 
@@ -31,15 +36,3 @@ class UserImgSerializer(serializers.ModelSerializer):
         model = User
         fields = ('profile_img', 'id')
 
-# class CommentSerializer(serializers.ModelSerializer):
-#     class UserSerializer(serializers.ModelSerializer):
-#             class Meta:
-#                 model = User
-#                 fields = ('pk', 'username', 'profile_img')
-
-#     user = UserSerializer(read_only=True)
-#     class Meta:
-#         model = Comment
-#         fields = ('pk', 'user', 'content', 'profile', 'created_at',)
-#         read_only_fields = ('profile',)
-    
