@@ -24,16 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-OPENAI_API_KEY = env("OPENAI_API_KEY")
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'REDACTED'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
+
+# DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -176,12 +175,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.User'
 
-TMDB_API_KEY = '1593e61ad102246a93537bf80f459601'
-
-
 from decouple import config
 
+TMDB_API_KEY = config('TMDB_API_KEY')
+
+
 OPENAI_API_KEY = config("VITE_OPEN_AI_API_KEY", default=None)
+
+SECRET_KEY = env("DJANGO_SECRET_KEY")
+
 
 REST_AUTH = {
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
